@@ -66,7 +66,7 @@ describe("GET:/api/articles", () => {
   });
 });
 
-xdescribe("GET /api/users", () => {
+describe("GET /api/users", () => {
     test("200: responds with an array of objects with slug and description props ", () => {
       return request(app)
         .get("/api/users")
