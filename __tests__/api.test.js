@@ -141,6 +141,15 @@ describe("PATCH:/api/articles:article_id/", () => {
         expect(body.msg).toBe("bad request");
       });
   });
+  test("400: body has inc_votes, but invalid data type (str)", () => {
+    return request(app)
+      .patch("/api/articles/6")
+      .expect(400)
+      .send({inc_votes : 'bread',banana:'100'})
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
+      });
+  });
 });
 
 describe("GET /api/users", () => {
@@ -151,6 +160,7 @@ describe("GET /api/users", () => {
       .then(({ body }) => {
         expect(Array.isArray(body.users)).toBe(true);
         expect(body.users.length > 0).toBe(true);
+        expect(body.users.length).toBe(4)
 
         body.users.forEach((obj) => {
           expect(obj).toHaveProperty("username");
