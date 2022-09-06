@@ -86,6 +86,25 @@ describe("PATCH:/api/articles:article_id/", () => {
         );
       });
   });
+  test("200:update votes on article by id removing votes (returns updated object)", () => {
+    return request(app)
+      .patch("/api/articles/6")
+      .expect(200)
+      .send({ inc_votes: -100 })
+      .then(({ body }) => {
+        expect(body.article).toEqual(
+          expect.objectContaining({
+            author: "icellusedkars",
+            title: "A",
+            topic: "mitch",
+            article_id: 6,
+            body: "Delicious tin of cat food",
+            created_at: "2020-10-18T01:00:00.000Z",
+            votes: -100,
+          })
+        );
+      });
+  });
   test("404: invalid id doesnt exist(still a number)", () => {
     return request(app)
       .patch("/api/articles/34890384")

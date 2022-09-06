@@ -16,7 +16,7 @@ exports.updateArticle = (articleId, body)=>{
     return Promise.return({status: 400 , msg: 'bad request'})
   }
   const newVotes = body.inc_votes
-  return db.query('UPDATE articles SET votes = $1 WHERE article_id = $2 RETURNING *', [newVotes,articleId])
+  return db.query('UPDATE articles SET votes = votes+$1 WHERE article_id = $2 RETURNING *', [newVotes,articleId])
   
   .then(article=>{
     if(article.rows.length === 0){
