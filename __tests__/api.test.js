@@ -29,8 +29,12 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe("GET:/api/articles", () => {
-  test("200:Get article by id (object)", () => {
+describe('GET /api/articles', () => {
+    test('200: responds with articles array with correct props', () => {
+        
+    });});
+describe("GET:/api/articles/:article_id", () => {
+  test("200:Get article by id (object) with comment count", () => {
     return request(app)
       .get("/api/articles/6")
       .expect(200)
@@ -39,11 +43,12 @@ describe("GET:/api/articles", () => {
           expect.objectContaining({
             author: expect.any(String),
             title: expect.any(String),
-            article_id: expect.any(Number),
+            article_id: 6,
             body: expect.any(String),
             topic: expect.any(String),
             created_at: expect.any(String),
             votes: expect.any(Number),
+            comment_count: "1",
           })
         );
       });
@@ -53,7 +58,7 @@ describe("GET:/api/articles", () => {
       .get("/api/articles/34890384")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("bad request");
+        expect(body.msg).toBe("Not Found");
       });
   });
   test("400: invalid id (string)", () => {
@@ -127,7 +132,7 @@ describe("PATCH:/api/articles:article_id/", () => {
     return request(app)
       .patch("/api/articles/sdsc")
       .expect(400)
-      .send({banana : 100})
+      .send({ banana: 100 })
       .then(({ body }) => {
         expect(body.msg).toBe("bad request");
       });
@@ -136,7 +141,7 @@ describe("PATCH:/api/articles:article_id/", () => {
     return request(app)
       .patch("/api/articles/sdsc")
       .expect(400)
-      .send({inc_votes : 100,banana:'100'})
+      .send({ inc_votes: 100, banana: "100" })
       .then(({ body }) => {
         expect(body.msg).toBe("bad request");
       });
@@ -145,7 +150,7 @@ describe("PATCH:/api/articles:article_id/", () => {
     return request(app)
       .patch("/api/articles/6")
       .expect(400)
-      .send({inc_votes : 'bread',banana:'100'})
+      .send({ inc_votes: "bread", banana: "100" })
       .then(({ body }) => {
         expect(body.msg).toBe("bad request");
       });
@@ -160,7 +165,7 @@ describe("GET /api/users", () => {
       .then(({ body }) => {
         expect(Array.isArray(body.users)).toBe(true);
         expect(body.users.length > 0).toBe(true);
-        expect(body.users.length).toBe(4)
+        expect(body.users.length).toBe(4);
 
         body.users.forEach((obj) => {
           expect(obj).toHaveProperty("username");
