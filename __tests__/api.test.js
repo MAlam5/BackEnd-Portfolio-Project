@@ -29,10 +29,74 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe('GET /api/articles', () => {
-    test('200: responds with articles array with correct props', () => {
+describe("GET /api/articles", () => {
+  test("200: responds with articles array with correct props", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length > 0).toBe(true);
+        expect(body.articles.length).toBe(5)
+        body.articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                comment_count: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("200: responds with articles array sorted by date desc", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy('created_at',{
+            descending: true,})
         
-    });});
+      });
+  });
+  test("200: responds with articles array filtered by topic if query is given", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length > 0).toBe(true);
+        expect(body.articles.length).toBe(1)
+        body.articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: 'cats',
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                comment_count: expect.any(String),
+            })
+          );
+        });
+        
+      });
+  });
+  test("400: bad request if queried topic doesnt exist ", () => {
+    return request(app)
+      .get("/api/articles?topic=banananna")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request')
+        
+      });
+  });
+});
 describe("GET:/api/articles/:article_id", () => {
   test("200:Get article by id (object) with comment count", () => {
     return request(app)
