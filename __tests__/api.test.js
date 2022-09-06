@@ -65,3 +65,21 @@ describe("GET:/api/articles", () => {
       });
   });
 });
+
+describe("GET /api/users", () => {
+    test("200: responds with an array of objects with slug and description props ", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Array.isArray(body.users)).toBe(true);
+          expect(body.users.length > 0).toBe(true);
+  
+          body.users.forEach((obj) => {
+            expect(obj).toHaveProperty("username");
+            expect(obj).toHaveProperty("name");
+            expect(obj).toHaveProperty("avatar_url");
+          });
+        });
+    });
+  });
