@@ -8,4 +8,10 @@ exports.getArticleById = (req, res, next) => {
       })
       .catch(next);
   };
+
+  exports.patchArticle=()=>{
+    const articleId = req.params.article_id
+    const { body }= req
+    updateArticle(articleId, body )
+  }
   

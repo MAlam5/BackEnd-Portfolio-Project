@@ -48,10 +48,10 @@ describe("GET:/api/articles", () => {
         );
       });
   });
-  test("400: invalid id doesnt exist(still a number)", () => {
+  test("404: invalid id doesnt exist(still a number)", () => {
     return request(app)
       .get("/api/articles/34890384")
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe('bad request')
       });
