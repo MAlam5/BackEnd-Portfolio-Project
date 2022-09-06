@@ -1,8 +1,10 @@
+const { application } = require("express");
 const express = require("express");
 const { getArticleById, patchArticle } = require("./controllers/api.articles.controller");
 const {
   getTopics,
 } = require("./controllers/api.topics.contoller");
+const { getUsers } = require("./controllers/api.users.contoller");
 const { handleServerError, handleCustomError, handleSqlError } = require("./error_handlers/errors");
 
 const app = express();
