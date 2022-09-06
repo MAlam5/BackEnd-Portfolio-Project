@@ -1,19 +1,15 @@
 const db = require("../../db/connection");
 
 exports.fetchArticlebyId = (article_id) => {
-  return db
-    .query(`SELECT * FROM articles WHERE article_id = $1 `, [article_id])
-    .then((article) => {
-      if (article.rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "bad request" });
+  return db.query('SELECT articles.article_id, articles.author, articles.title,  articles.body, articles.topic, articles.created_at, articles.votes, COUNT(comments.body) AS comment_count FROM articles JOIN comments ON articles.article_id = comments.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id',[article_id])
+    .then((article)=>{
+      if(article.rows.length === 0){
+        return Promise.reject({status:404 , msg: "Not Found"})
       }
-      const comments = db.query('SELECT * FROM comments WHERE article_id =$1',[article_id])
-      return Promise.all([article.rows[0], comments]) ;
-    }).then(([article, commentsArr])=>{
-      article.comment_count = commentsArr.rows.length
-      return article
+      return article.rows[0]
     })
-};
+  }
+
 
 exports.updateArticle = (articleId, body) => {
   if (Object.keys(body).length !== 1 && !body.hasOwnProperty("inc_votes")) {

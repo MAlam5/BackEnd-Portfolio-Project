@@ -29,7 +29,11 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe("GET:/api/articles", () => {
+describe('GET /api/articles', () => {
+    test('200: responds with articles array with correct props', () => {
+        
+    });});
+describe("GET:/api/articles/:article_id", () => {
   test("200:Get article by id (object) with comment count", () => {
     return request(app)
       .get("/api/articles/6")
@@ -44,7 +48,7 @@ describe("GET:/api/articles", () => {
             topic: expect.any(String),
             created_at: expect.any(String),
             votes: expect.any(Number),
-            comment_count: 1,
+            comment_count: "1",
           })
         );
       });
@@ -54,7 +58,7 @@ describe("GET:/api/articles", () => {
       .get("/api/articles/34890384")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("bad request");
+        expect(body.msg).toBe("Not Found");
       });
   });
   test("400: invalid id (string)", () => {
