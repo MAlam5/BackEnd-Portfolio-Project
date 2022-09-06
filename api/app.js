@@ -1,12 +1,19 @@
-const express = require('express')
-const { getTopics, getArticleById } = require('./controllers/api.topics.contoller')
-const { handleServerError } = require('./error_handlers/errors')
+const express = require("express");
+const { getArticleById } = require("./controllers/api.articles.controller");
+const {
+  getTopics,
+} = require("./controllers/api.topics.contoller");
+const { handleServerError, handleCustomError, handleSqlError } = require("./error_handlers/errors");
 
-const app = express()
+const app = express();
 
-app.get('/api/topics', getTopics)
+app.get("/api/topics", getTopics);
 
-app.get('/api/articles/:article_id',getArticleById)
+app.get("/api/articles/:article_id", getArticleById);
 
-app.use(handleServerError)
-module.exports = app
+app.use(handleCustomError);
+
+app.use(handleSqlError);
+
+app.use(handleServerError);
+module.exports = app;
