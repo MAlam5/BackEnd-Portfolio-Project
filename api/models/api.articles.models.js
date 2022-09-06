@@ -2,12 +2,17 @@ const db = require("../../db/connection");
 
 exports.fetchArticlebyId = (article_id) => {
   return db
-    .query("SELECT * FROM articles WHERE article_id = $1", [article_id])
+    .query(`SELECT * FROM articles WHERE article_id = $1 `, [article_id])
     .then((article) => {
-      if (article.rows.length === 0)
+      if (article.rows.length === 0) {
         return Promise.reject({ status: 404, msg: "bad request" });
-      return article.rows[0];
-    });
+      }
+      const comments = db.query('SELECT * FROM comments WHERE article_id =$1',[article_id])
+      return Promise.all([article.rows[0], comments]) ;
+    }).then(([article, commentsArr])=>{
+      article.comment_count = commentsArr.rows.length
+      return article
+    })
 };
 
 exports.updateArticle = (articleId, body) => {
