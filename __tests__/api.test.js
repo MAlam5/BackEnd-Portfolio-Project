@@ -37,17 +37,17 @@ describe("GET /api/articles", () => {
       .then(({ body }) => {
         expect(Array.isArray(body.articles)).toBe(true);
         expect(body.articles.length > 0).toBe(true);
-        expect(body.articles.length).toBe(5)
+        expect(body.articles.length).toBe(5);
         body.articles.forEach((article) => {
           expect(article).toEqual(
             expect.objectContaining({
-                author: expect.any(String),
-                title: expect.any(String),
-                article_id: expect.any(Number),
-                topic: expect.any(String),
-                created_at: expect.any(String),
-                votes: expect.any(Number),
-                comment_count: expect.any(String),
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(String),
             })
           );
         });
@@ -58,9 +58,9 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles).toBeSortedBy('created_at',{
-            descending: true,})
-        
+        expect(body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
       });
   });
   test("200: responds with articles array filtered by topic if query is given", () => {
@@ -70,21 +70,20 @@ describe("GET /api/articles", () => {
       .then(({ body }) => {
         expect(Array.isArray(body.articles)).toBe(true);
         expect(body.articles.length > 0).toBe(true);
-        expect(body.articles.length).toBe(1)
+        expect(body.articles.length).toBe(1);
         body.articles.forEach((article) => {
           expect(article).toEqual(
             expect.objectContaining({
-                author: expect.any(String),
-                title: expect.any(String),
-                article_id: expect.any(Number),
-                topic: 'cats',
-                created_at: expect.any(String),
-                votes: expect.any(Number),
-                comment_count: expect.any(String),
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: "cats",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(String),
             })
           );
         });
-        
       });
   });
   test("400: bad request if queried topic doesnt exist ", () => {
@@ -92,8 +91,15 @@ describe("GET /api/articles", () => {
       .get("/api/articles?topic=banananna")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('bad request')
-        
+        expect(body.msg).toBe("bad request");
+      });
+  });
+   test("200: responds with empty array if valid topic but no articles ", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toEqual([]);
       });
   });
 });
@@ -135,6 +141,31 @@ describe("GET:/api/articles/:article_id", () => {
   });
 });
 
+xdescribe("GET /api/articles/:article_id/comments", () => {
+  test("200: responds with an array of commenst for article id", () => {
+    return request(app)
+      .get("api/articles/6/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.comments)).toBe(true);
+        expect(body.comments.length > 0).toBe(true);
+
+        expect(body.comments.length).toBe(x);
+
+        body.comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
 describe("PATCH:/api/articles:article_id/", () => {
   test("200:update votes on article by id (returns updated object)", () => {
     return request(app)

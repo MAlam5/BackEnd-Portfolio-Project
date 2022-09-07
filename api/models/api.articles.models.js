@@ -1,4 +1,5 @@
 const db = require("../../db/connection");
+const articles = require("../../db/data/test-data/articles");
 
 exports.fetchArticlebyId = (article_id) => {
   return db
@@ -45,8 +46,34 @@ exports.fetchArticles = (topicsQuery) => {
   queryStr +=
     " GROUP BY articles.article_id ORDER BY articles.created_at DESC;";
 
-  return db.query(queryStr, queryArr).then((articles) => {
-    if(articles.rows.length === 0 ) return Promise.reject({status:400 , msg: 'bad request'})
-    return articles.rows;
-  });
+  return db
+    .query(queryStr, queryArr)
+    .then((articles) => {
+      const promiseAll = [articles.rows]
+      if (articles.rows.length === 0) {
+        const checkTopicExists = db.query(
+          "SELECT * FROM topics WHERE slug = $1",
+          [topicsQuery]
+        );
+        promiseAll.push(checkTopicExists)
+      } 
+      return Promise.all(promiseAll);
+    })
+    .then(([articles, checkTopicExists]) => {
+      if(articles.length>0){
+        return articles
+      }
+      if(checkTopicExists.rows.length > 0){
+        return []
+      }else{
+        return Promise.reject({
+          status: 400,
+          msg: "bad request",
+        })
+      }
+    });
+};
+
+exports.fetchCommentsByArticleId = (articleId) => {
+  return db.query("SELECT comment_id, votes,created_at,author,body");
 };
