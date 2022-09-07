@@ -12,6 +12,18 @@ afterAll(() => {
   return db.end();
 });
 
+describe("GET /api", () => {
+  test("reponds with json of current endpoints ", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.hasOwnProperty("endpoints")).toBe(true);
+        expect(typeof body.endpoints).toBe("object");
+      });
+  });
+});
+
 describe("GET /api/topics", () => {
   test("200: responds with an array of objects with slug and description props ", () => {
     return request(app)
@@ -94,7 +106,7 @@ describe("GET /api/articles", () => {
         expect(body.msg).toBe("bad request");
       });
   });
-   test("200: responds with empty array if valid topic but no articles ", () => {
+  test("200: responds with empty array if valid topic but no articles ", () => {
     return request(app)
       .get("/api/articles?topic=paper")
       .expect(200)
@@ -103,7 +115,7 @@ describe("GET /api/articles", () => {
       });
   });
 });
-describe("GET:/api/articles/:article_id", () => {
+describe("GET /api/articles/:article_id", () => {
   test("200:Get article by id (object) with comment count", () => {
     return request(app)
       .get("/api/articles/6")
