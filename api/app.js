@@ -1,6 +1,6 @@
 const { application } = require("express");
 const express = require("express");
-const { getArticleById, patchArticle, getArticles } = require("./controllers/api.articles.controller");
+const { getArticleById, patchArticle, getArticles, getCommentsByArticleId } = require("./controllers/api.articles.controller");
 const {
   getTopics,
 } = require("./controllers/api.topics.contoller");
@@ -20,6 +20,8 @@ app .get('/api/users',getUsers)
 app.get('/api/articles',getArticles)
 
 app.patch('/api/articles/:article_id', patchArticle)
+
+app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
 
 app.use(handleCustomError);
 

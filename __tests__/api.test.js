@@ -141,16 +141,16 @@ describe("GET:/api/articles/:article_id", () => {
   });
 });
 
-xdescribe("GET /api/articles/:article_id/comments", () => {
+describe("GET /api/articles/:article_id/comments", () => {
   test("200: responds with an array of commenst for article id", () => {
     return request(app)
-      .get("api/articles/6/comments")
+      .get("/api/articles/5/comments")
       .expect(200)
       .then(({ body }) => {
         expect(Array.isArray(body.comments)).toBe(true);
         expect(body.comments.length > 0).toBe(true);
 
-        expect(body.comments.length).toBe(x);
+        expect(body.comments.length).toBe(2);
 
         body.comments.forEach((comment) => {
           expect(comment).toEqual(
@@ -163,6 +163,30 @@ xdescribe("GET /api/articles/:article_id/comments", () => {
             })
           );
         });
+      });
+  });
+  test("404: invalid id doesnt exist(still a number)", () => {
+    return request(app)
+      .get("/api/articles/34890384/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+  test("400: invalid id (string)", () => {
+    return request(app)
+      .get("/api/articles/sdsc/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
+      });
+  });
+  test("200: responds with empty array if valid id but no comments ", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toEqual([]);
       });
   });
 });
