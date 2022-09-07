@@ -7,8 +7,8 @@ const {
 } = require("../models/api.articles.models");
 
 exports.getArticles = (req, res, next) => {
-  const topicQuery = req.query.topic;
-  return fetchArticles(topicQuery)
+  const {topic, sort_by , order} = req.query
+  return fetchArticles(topic, sort_by , order)
     .then((articles) => {
       res.status(200).send({ articles });
     })
