@@ -1,3 +1,4 @@
+const { query } = require("../../db/connection");
 const db = require("../../db/connection");
 
 exports.fetchArticlebyId = (article_id) => {
@@ -33,17 +34,31 @@ exports.updateArticle = (articleId, body) => {
     });
 };
 
-exports.fetchArticles = (topicsQuery) => {
+exports.fetchArticles = (topic, sortBy = "created_at", order = "DESC") => {
   const queryArr = [];
+  const sortByArray = [
+    "article_id",
+    "author",
+    "title",
+    "body",
+    "topic",
+    "created_at",
+    "votes",
+    "comment_count",
+  ];
+  const orderArray = ["ASC","DESC"];
+  if (!sortByArray.includes(sortBy) || !orderArray.includes(order.toUpperCase())) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
   let queryStr =
-    "SELECT articles.article_id, articles.author, articles.title,  articles.body, articles.topic, articles.created_at, articles.votes, COUNT(comments.body) AS comment_count FROM articles JOIN comments ON articles.article_id = comments.article_id";
-  if (topicsQuery) {
-    queryArr.push(topicsQuery);
-    queryStr += " WHERE articles.topic = $1";
+    "SELECT articles.article_id, articles.author, articles.title,  articles.body, articles.topic, articles.created_at, articles.votes, COUNT(comments.body):: INT AS  comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id";
+
+  if (topic) {
+    queryArr.push(topic);
+    queryStr += ` WHERE articles.topic = $${queryArr.length}`;
   }
 
-  queryStr +=
-    " GROUP BY articles.article_id ORDER BY articles.created_at DESC;";
+  queryStr += ` GROUP BY articles.article_id ORDER BY ${sortBy} ${order};`;
 
   return db
     .query(queryStr, queryArr)
@@ -52,7 +67,7 @@ exports.fetchArticles = (topicsQuery) => {
       if (articles.rows.length === 0) {
         const checkTopicExists = db.query(
           "SELECT * FROM topics WHERE slug = $1",
-          [topicsQuery]
+          [topic]
         );
         promiseAll.push(checkTopicExists);
       }
@@ -128,3 +143,4 @@ exports.addCommentByArticleId = (articleId, body) => {
       return comment.rows[0]
     });
 };
+

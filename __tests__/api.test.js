@@ -37,7 +37,7 @@ describe("GET /api/articles", () => {
       .then(({ body }) => {
         expect(Array.isArray(body.articles)).toBe(true);
         expect(body.articles.length > 0).toBe(true);
-        expect(body.articles.length).toBe(5);
+        expect(body.articles.length).toBe(12);
         body.articles.forEach((article) => {
           expect(article).toEqual(
             expect.objectContaining({
@@ -47,7 +47,7 @@ describe("GET /api/articles", () => {
               topic: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
-              comment_count: expect.any(String),
+              comment_count: expect.any(Number),
             })
           );
         });
@@ -80,7 +80,7 @@ describe("GET /api/articles", () => {
               topic: "cats",
               created_at: expect.any(String),
               votes: expect.any(Number),
-              comment_count: expect.any(String),
+              comment_count: expect.any(Number),
             })
           );
         });
@@ -100,6 +100,79 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.articles).toEqual([]);
+      });
+  });
+  test("200 queries: sort_by in correct order (default: desc)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count")
+      .expect(200)
+      .then(({ body }) => {
+
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length).toBe(12);
+        expect(body.articles).toBeSortedBy("comment_count", {
+          descending: true,
+        });
+      });
+  });
+  test("200 queries: order in correct order (NO sort_by)", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length).toBe(12);
+        expect(body.articles).toBeSortedBy("created_at");
+      });
+  });
+  test("200 queries: order in correct order with sort_by", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length).toBe(12);
+        expect(body.articles).toBeSortedBy("title");
+      });
+  });
+  test("400 queries: sort_by column that doesnt exist", () => {
+    return request(app)
+      .get("/api/articles?sort_by=fdweilkhjb")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request')
+      });
+  });
+  test("400 queries: order not valid ", () => {
+    return request(app)
+      .get("/api/articles?order=upward")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request')
+      });
+  });
+  test("200 queries: topic with sort and order ", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=created_at&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length > 0).toBe(true);
+        expect(body.articles.length).toBe(11);
+        expect(body.articles).toBeSortedBy('created_at')
+        body.articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: "mitch",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
       });
   });
 });
