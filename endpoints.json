@@ -67,9 +67,9 @@
     }
   },
   "PATCH:/api/articles:article_id/": {
-    "description": "allows user to change the votes of an article ",
+    "description": "allows user to add the votes of an article ",
     "queries": [],
-    "body":{"inc_votes":100},
+    "exampleRequest": { "inc_votes": 100 },
     "exampleResponse": {
       "article": {
         "author": "icellusedkars",
@@ -81,5 +81,27 @@
         "votes": 100
       }
     }
+  },
+  "POST:/api/articles/:article_id/comments": {
+    "description": "allows user to add a new comment to an article and repsonds with the posted comment",
+    "queries": [],
+    "exampleRequest": {
+      "username": "icellusedkars",
+      "body": "Something smells fishy"
+    },
+    "exampleResponse": {
+      "comment": {
+        "author": "icellusedkars",
+        "article_id": 5,
+        "body": "Something smells fishy",
+        "created_at": "time created",
+        "votes": 0
+      }
+    }
+  },
+  "DELETE: /api/comments/:comment_id": {
+    "description": "allows user to delete a comment from an article by the comment id repsonds 204 status and no body",
+    "queries": [],
+    "exampleResponse": "204 status code"
   }
 }
