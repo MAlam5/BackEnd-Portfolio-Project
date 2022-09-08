@@ -295,6 +295,72 @@ describe("GET /api/users", () => {
   });
 });
 
+
+describe('POST/api/articles/:article_id/comments', () => {
+    test('201: responds with the posted comment', () => {
+        return request(app)
+      .post("/api/articles/5/comments")
+      .expect(201)
+      .send({ username:'icellusedkars',body:'Something smells fishy' })
+      .then(({ body }) => {
+        expect(body.postedComment).toEqual(
+          expect.objectContaining({
+            author: "icellusedkars",
+            article_id: 5,
+            body: "Something smells fishy",
+            created_at: expect.any(String),
+            votes: 0,
+          })
+        );
+      });
+    });
+    test("404: invalid id doesnt exist(still a number)", () => {
+        return request(app)
+        .post("/api/articles/432890/comments")
+          .expect(404)
+          .send({ username:'icellusedkars',body:'Something smells fishy' })
+          .then(({ body }) => {
+            expect(body.msg).toBe("Not Found");
+          });
+      });
+      test("400: invalid id (string)", () => {
+        return request(app)
+        .post("/api/articles/bwdwdsx/comments")
+        .send({ username:'icellusedkars',body:'Something smells fishy' })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("bad request");
+          });
+      });
+      test("400: body has object but noo username key ", () => {
+        return request(app)
+        .post("/api/articles/5/comments")
+          .expect(400)
+          .send({ dfnj:'icellusedkars',body:'Something smells fishy' })
+          .then(({ body }) => {
+            expect(body.msg).toBe("bad request");
+          });
+      });
+      test("400: body has object but no body key ", () => {
+        return request(app)
+        .post("/api/articles/5/comments")
+          .expect(400)
+          .send({ username:'icellusedkars',edf:'Something smells fishy' })
+          .then(({ body }) => {
+            expect(body.msg).toBe("bad request");
+          });
+      });
+      test("400: username doesnt exist", () => {
+        return request(app)
+        .post("/api/articles/5/comments")
+          .expect(400)
+          .send({ username:'ijbncd',body:'Something smells fishy' })
+          .then(({ body }) => {
+            expect(body.msg).toBe("user doesn't exist");
+          });
+      });
+});
+
 describe("DELETE: /api/comments/:comment_id", () => {
   test("204: responds with status only", () => {
     return request(app).delete("/api/comments/1").expect(204);
@@ -317,3 +383,4 @@ describe("DELETE: /api/comments/:comment_id", () => {
       });
   });
 });
+
