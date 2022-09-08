@@ -12,6 +12,7 @@ You wil need the following dependencies to run this repo :
     2. Postgres (minimum version ^8.7.3)
 
 To run this repo locally you will need to:
+
     1. Clone the repo - Click the green code button copy the https link. Then in the folder where you want to clone open a terminal and run git clone THE_URL
 
     2. Next in the cli run > npm install , this is to install all the dependencies mentioned above .
