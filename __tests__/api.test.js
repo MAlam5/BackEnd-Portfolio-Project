@@ -37,7 +37,7 @@ describe("GET /api/articles", () => {
       .then(({ body }) => {
         expect(Array.isArray(body.articles)).toBe(true);
         expect(body.articles.length > 0).toBe(true);
-        expect(body.articles.length).toBe(5);
+        expect(body.articles.length).toBe(12);
         body.articles.forEach((article) => {
           expect(article).toEqual(
             expect.objectContaining({
@@ -102,14 +102,14 @@ describe("GET /api/articles", () => {
         expect(body.articles).toEqual([]);
       });
   });
-  test("200 queries: sort_by in correct order (deafult: desc)", () => {
+  test("200 queries: sort_by in correct order (default: desc)", () => {
     return request(app)
       .get("/api/articles?sort_by=comment_count")
       .expect(200)
       .then(({ body }) => {
+
         expect(Array.isArray(body.articles)).toBe(true);
-        expect(body.articles.length > 0).toBe(true);
-        expect(body.articles.length).toBe(5);
+        expect(body.articles.length).toBe(12);
         expect(body.articles).toBeSortedBy("comment_count", {
           descending: true,
         });
@@ -121,8 +121,7 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         expect(Array.isArray(body.articles)).toBe(true);
-        expect(body.articles.length > 0).toBe(true);
-        expect(body.articles.length).toBe(5);
+        expect(body.articles.length).toBe(12);
         expect(body.articles).toBeSortedBy("created_at");
       });
   });
@@ -132,8 +131,7 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         expect(Array.isArray(body.articles)).toBe(true);
-        expect(body.articles.length > 0).toBe(true);
-        expect(body.articles.length).toBe(5);
+        expect(body.articles.length).toBe(12);
         expect(body.articles).toBeSortedBy("title");
       });
   });
@@ -160,7 +158,7 @@ describe("GET /api/articles", () => {
       .then(({ body }) => {
         expect(Array.isArray(body.articles)).toBe(true);
         expect(body.articles.length > 0).toBe(true);
-        expect(body.articles.length).toBe(4);
+        expect(body.articles.length).toBe(11);
         expect(body.articles).toBeSortedBy('created_at')
         body.articles.forEach((article) => {
           expect(article).toEqual(

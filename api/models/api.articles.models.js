@@ -47,12 +47,12 @@ exports.fetchArticles = (topic, sortBy = "created_at", order = "DESC") => {
     "votes",
     "comment_count",
   ];
-  const orderArray = ["asc", "ASC", "desc", "DESC"];
-  if (!sortByArray.includes(sortBy) || !orderArray.includes(order)) {
+  const orderArray = ["ASC","DESC"];
+  if (!sortByArray.includes(sortBy) || !orderArray.includes(order.toUpperCase())) {
     return Promise.reject({ status: 400, msg: "bad request" });
   }
   let queryStr =
-    "SELECT articles.article_id, articles.author, articles.title,  articles.body, articles.topic, articles.created_at, articles.votes, COUNT(comments.body):: INT AS  comment_count FROM articles JOIN comments ON articles.article_id = comments.article_id";
+    "SELECT articles.article_id, articles.author, articles.title,  articles.body, articles.topic, articles.created_at, articles.votes, COUNT(comments.body):: INT AS  comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id";
 
   if (topic) {
     queryArr.push(topic);
