@@ -6,7 +6,7 @@ const { deleteCommentById } = require("./controllers/api.comments.contoller");
 const {
   getTopics,
 } = require("./controllers/api.topics.contoller");
-const { getUsers } = require("./controllers/api.users.contoller");
+const { getUsers, getUserByUsername } = require("./controllers/api.users.contoller");
 const { handleServerError, handleCustomError, handleSqlError } = require("./error_handlers/errors");
 
 const app = express();
@@ -20,6 +20,8 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticleById);
 
 app .get('/api/users',getUsers)
+
+app.get('/api/users/:username', getUserByUsername)
 
 app.get('/api/articles',getArticles)
 
