@@ -49,7 +49,7 @@ describe("GET /api/articles", () => {
       .then(({ body }) => {
         expect(Array.isArray(body.articles)).toBe(true);
         expect(body.articles.length > 0).toBe(true);
-        expect(body.articles.length).toBe(5);
+        expect(body.articles.length).toBe(12);
         body.articles.forEach((article) => {
           expect(article).toEqual(
             expect.objectContaining({
@@ -59,7 +59,7 @@ describe("GET /api/articles", () => {
               topic: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
-              comment_count: expect.any(String),
+              comment_count: expect.any(Number),
             })
           );
         });
@@ -92,7 +92,7 @@ describe("GET /api/articles", () => {
               topic: "cats",
               created_at: expect.any(String),
               votes: expect.any(Number),
-              comment_count: expect.any(String),
+              comment_count: expect.any(Number),
             })
           );
         });
@@ -112,6 +112,79 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.articles).toEqual([]);
+      });
+  });
+  test("200 queries: sort_by in correct order (default: desc)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count")
+      .expect(200)
+      .then(({ body }) => {
+
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length).toBe(12);
+        expect(body.articles).toBeSortedBy("comment_count", {
+          descending: true,
+        });
+      });
+  });
+  test("200 queries: order in correct order (NO sort_by)", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length).toBe(12);
+        expect(body.articles).toBeSortedBy("created_at");
+      });
+  });
+  test("200 queries: order in correct order with sort_by", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length).toBe(12);
+        expect(body.articles).toBeSortedBy("title");
+      });
+  });
+  test("400 queries: sort_by column that doesnt exist", () => {
+    return request(app)
+      .get("/api/articles?sort_by=fdweilkhjb")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request')
+      });
+  });
+  test("400 queries: order not valid ", () => {
+    return request(app)
+      .get("/api/articles?order=upward")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('bad request')
+      });
+  });
+  test("200 queries: topic with sort and order ", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=created_at&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length > 0).toBe(true);
+        expect(body.articles.length).toBe(11);
+        expect(body.articles).toBeSortedBy('created_at')
+        body.articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: "mitch",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
       });
   });
 });
@@ -306,3 +379,93 @@ describe("GET /api/users", () => {
       });
   });
 });
+
+
+describe('POST/api/articles/:article_id/comments', () => {
+    test('201: responds with the posted comment', () => {
+        return request(app)
+      .post("/api/articles/5/comments")
+      .expect(201)
+      .send({ username:'icellusedkars',body:'Something smells fishy' })
+      .then(({ body }) => {
+        expect(body.postedComment).toEqual(
+          expect.objectContaining({
+            author: "icellusedkars",
+            article_id: 5,
+            body: "Something smells fishy",
+            created_at: expect.any(String),
+            votes: 0,
+          })
+        );
+      });
+    });
+    test("404: invalid id doesnt exist(still a number)", () => {
+        return request(app)
+        .post("/api/articles/432890/comments")
+          .expect(404)
+          .send({ username:'icellusedkars',body:'Something smells fishy' })
+          .then(({ body }) => {
+            expect(body.msg).toBe("Not Found");
+          });
+      });
+      test("400: invalid id (string)", () => {
+        return request(app)
+        .post("/api/articles/bwdwdsx/comments")
+        .send({ username:'icellusedkars',body:'Something smells fishy' })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("bad request");
+          });
+      });
+      test("400: body has object but noo username key ", () => {
+        return request(app)
+        .post("/api/articles/5/comments")
+          .expect(400)
+          .send({ dfnj:'icellusedkars',body:'Something smells fishy' })
+          .then(({ body }) => {
+            expect(body.msg).toBe("bad request");
+          });
+      });
+      test("400: body has object but no body key ", () => {
+        return request(app)
+        .post("/api/articles/5/comments")
+          .expect(400)
+          .send({ username:'icellusedkars',edf:'Something smells fishy' })
+          .then(({ body }) => {
+            expect(body.msg).toBe("bad request");
+          });
+      });
+      test("400: username doesnt exist", () => {
+        return request(app)
+        .post("/api/articles/5/comments")
+          .expect(400)
+          .send({ username:'ijbncd',body:'Something smells fishy' })
+          .then(({ body }) => {
+            expect(body.msg).toBe("user doesn't exist");
+          });
+      });
+});
+
+describe("DELETE: /api/comments/:comment_id", () => {
+  test("204: responds with status only", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+
+  test("404: invalid id doesnt exist(still a number)", () => {
+    return request(app)
+      .delete("/api/comments/798")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+  test("400: invalid id (string)", () => {
+    return request(app)
+      .delete("/api/comments/lijuhb")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
+      });
+  });
+});
+

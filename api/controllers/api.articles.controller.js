@@ -4,11 +4,12 @@ const {
   updateArticle,
   fetchArticles,
   fetchCommentsByArticleId,
+  addCommentByArticleId,
 } = require("../models/api.articles.models");
 
 exports.getArticles = (req, res, next) => {
-  const topicQuery = req.query.topic;
-  return fetchArticles(topicQuery)
+  const {topic, sort_by , order} = req.query
+  return fetchArticles(topic, sort_by , order)
     .then((articles) => {
       res.status(200).send({ articles });
     })
@@ -36,7 +37,19 @@ exports.patchArticle = (req, res, next) => {
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const articleId = req.params.article_id;
-  return fetchCommentsByArticleId(articleId).then((comments) => {
-    res.status(200).send({ comments });
-  }).catch(next)
+  return fetchCommentsByArticleId(articleId)
+    .then((comments) => {
+      res.status(200).send({ comments });
+    })
+    .catch(next);
+};
+
+exports.postCommentByArticleId = (req, res, next) => {
+  const articleId = req.params.article_id;
+  const { body } = req;
+  return addCommentByArticleId(articleId, body)
+    .then((postedComment) => {
+      res.status(201).send({ postedComment });
+    })
+    .catch(next);
 };
