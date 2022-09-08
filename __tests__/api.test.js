@@ -94,7 +94,7 @@ describe("GET /api/articles", () => {
         expect(body.msg).toBe("bad request");
       });
   });
-   test("200: responds with empty array if valid topic but no articles ", () => {
+  test("200: responds with empty array if valid topic but no articles ", () => {
     return request(app)
       .get("/api/articles?topic=paper")
       .expect(200)
@@ -295,6 +295,7 @@ describe("GET /api/users", () => {
   });
 });
 
+
 describe('POST/api/articles/:article_id/comments', () => {
     test('201: responds with the posted comment', () => {
         return request(app)
@@ -359,3 +360,27 @@ describe('POST/api/articles/:article_id/comments', () => {
           });
       });
 });
+
+describe("DELETE: /api/comments/:comment_id", () => {
+  test("204: responds with status only", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+
+  test("404: invalid id doesnt exist(still a number)", () => {
+    return request(app)
+      .delete("/api/comments/798")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+  test("400: invalid id (string)", () => {
+    return request(app)
+      .delete("/api/comments/lijuhb")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
+      });
+  });
+});
+

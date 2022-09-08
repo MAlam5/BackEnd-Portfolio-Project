@@ -1,6 +1,9 @@
 const { application } = require("express");
 const express = require("express");
-const { getArticleById, patchArticle, getArticles, getCommentsByArticleId, postCommentByArticleId } = require("./controllers/api.articles.controller");
+
+
+const { getArticleById, patchArticle, getArticles, getCommentsByArticleId } = require("./controllers/api.articles.controller");
+const { deleteCommentById } = require("./controllers/api.comments.contoller");
 const {
   getTopics,
 } = require("./controllers/api.topics.contoller");
@@ -24,6 +27,8 @@ app.patch('/api/articles/:article_id', patchArticle)
 app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
 
 app.post('/api/articles/:article_id/comments',postCommentByArticleId)
+
+app.delete("/api/comments/:comment_id",deleteCommentById)
 
 app.use(handleCustomError);
 
