@@ -1,8 +1,6 @@
 const { application } = require("express");
 const express = require("express");
-
-
-const { getArticleById, patchArticle, getArticles, getCommentsByArticleId } = require("./controllers/api.articles.controller");
+const { getArticleById, patchArticle, getArticles, getCommentsByArticleId, postCommentByArticleId } = require("./controllers/api.articles.controller");
 const { deleteCommentById } = require("./controllers/api.comments.contoller");
 const {
   getTopics,
