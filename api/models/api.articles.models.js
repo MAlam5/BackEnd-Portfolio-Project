@@ -1,6 +1,5 @@
 const { query } = require("../../db/connection");
 const db = require("../../db/connection");
-const articles = require("../../db/data/test-data/articles");
 
 exports.fetchArticlebyId = (article_id) => {
   return db
@@ -116,3 +115,32 @@ exports.fetchCommentsByArticleId = (articleId) => {
       }
     });
 };
+
+exports.addCommentByArticleId = (articleId, body) => {
+  return db
+    .query("SELECT * FROM articles WHERE article_id =$1", [articleId])
+    .then((checkArticleIdExists) => {
+      if (checkArticleIdExists.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Not Found" });
+      }
+      if (!body.hasOwnProperty("body") || !body.hasOwnProperty("username")) {
+        return Promise.reject({ status: 400, msg: "bad request" });
+      }
+      return db.query("SELECT * FROM users WHERE username = $1", [
+        body.username,
+      ]);
+    })
+    .then((checkUsernameExists) => {
+      if (checkUsernameExists.rows.length === 0) {
+        return Promise.reject({ status: 400, msg: "user doesn't exist" });
+      }
+      return db.query(
+        `INSERT INTO comments (article_id,body,author) VALUES ($1,$2,$3) RETURNING *`,
+        [articleId, body.body, body.username]
+      );
+    })
+    .then((comment) => {
+      return comment.rows[0]
+    });
+};
+
