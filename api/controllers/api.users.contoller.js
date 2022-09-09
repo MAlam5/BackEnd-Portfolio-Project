@@ -1,9 +1,10 @@
 const { fetchUsers } = require("../models/api.users.models");
 
-exports.getUsers = (req, res, next) => {
-  return fetchUsers()
-    .then((users) => {
-      res.status(200).send({ users });
-    })
-    .catch(next);
+exports.getUsers = async(req, res, next) => {
+  try{
+  const users = await fetchUsers()
+  res.status(200).send({ users });
+  }catch(next){
+    next(err)
+  }
 };

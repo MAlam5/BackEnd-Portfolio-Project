@@ -30,10 +30,10 @@ describe("GET /api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        expect(Array.isArray(body)).toBe(true);
-        expect(body.length > 0).toBe(true);
+        expect(Array.isArray(body.topics)).toBe(true);
+        expect(body.topics.length > 0).toBe(true);
 
-        body.forEach((obj) => {
+        body.topics.forEach((obj) => {
           expect(obj).toHaveProperty("slug");
           expect(obj).toHaveProperty("description");
         });
