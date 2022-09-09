@@ -119,7 +119,6 @@ describe("GET /api/articles", () => {
       .get("/api/articles?sort_by=comment_count")
       .expect(200)
       .then(({ body }) => {
-
         expect(Array.isArray(body.articles)).toBe(true);
         expect(body.articles.length).toBe(12);
         expect(body.articles).toBeSortedBy("comment_count", {
@@ -152,7 +151,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles?sort_by=fdweilkhjb")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('bad request')
+        expect(body.msg).toBe("bad request");
       });
   });
   test("400 queries: order not valid ", () => {
@@ -160,7 +159,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles?order=upward")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('bad request')
+        expect(body.msg).toBe("bad request");
       });
   });
   test("200 queries: topic with sort and order ", () => {
@@ -171,7 +170,7 @@ describe("GET /api/articles", () => {
         expect(Array.isArray(body.articles)).toBe(true);
         expect(body.articles.length > 0).toBe(true);
         expect(body.articles.length).toBe(11);
-        expect(body.articles).toBeSortedBy('created_at')
+        expect(body.articles).toBeSortedBy("created_at");
         body.articles.forEach((article) => {
           expect(article).toEqual(
             expect.objectContaining({
@@ -380,13 +379,37 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET: /api/users/userame", () => {
+  test("200: responds with user object with correct props", () => {
+    return request(app)
+      .get("/api/users/icellusedkars")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.user).toEqual(
+          expect.objectContaining({
+            username: 'icellusedkars',
+            avatar_url: 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4',
+            name: 'sam',
+          })
+        );
+      });
+  });
+  test("404: invalid id doesnt exist", () => {
+    return request(app)
+      .get("/api/users/usernamedoestexist")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("user not found");
+      });
+  });
+});
 
-describe('POST/api/articles/:article_id/comments', () => {
-    test('201: responds with the posted comment', () => {
-        return request(app)
+describe("POST/api/articles/:article_id/comments", () => {
+  test("201: responds with the posted comment", () => {
+    return request(app)
       .post("/api/articles/5/comments")
       .expect(201)
-      .send({ username:'icellusedkars',body:'Something smells fishy' })
+      .send({ username: "icellusedkars", body: "Something smells fishy" })
       .then(({ body }) => {
         expect(body.postedComment).toEqual(
           expect.objectContaining({
@@ -398,52 +421,52 @@ describe('POST/api/articles/:article_id/comments', () => {
           })
         );
       });
-    });
-    test("404: invalid id doesnt exist(still a number)", () => {
-        return request(app)
-        .post("/api/articles/432890/comments")
-          .expect(404)
-          .send({ username:'icellusedkars',body:'Something smells fishy' })
-          .then(({ body }) => {
-            expect(body.msg).toBe("Not Found");
-          });
+  });
+  test("404: invalid id doesnt exist(still a number)", () => {
+    return request(app)
+      .post("/api/articles/432890/comments")
+      .expect(404)
+      .send({ username: "icellusedkars", body: "Something smells fishy" })
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
       });
-      test("400: invalid id (string)", () => {
-        return request(app)
-        .post("/api/articles/bwdwdsx/comments")
-        .send({ username:'icellusedkars',body:'Something smells fishy' })
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.msg).toBe("bad request");
-          });
+  });
+  test("400: invalid id (string)", () => {
+    return request(app)
+      .post("/api/articles/bwdwdsx/comments")
+      .send({ username: "icellusedkars", body: "Something smells fishy" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
       });
-      test("400: body has object but noo username key ", () => {
-        return request(app)
-        .post("/api/articles/5/comments")
-          .expect(400)
-          .send({ dfnj:'icellusedkars',body:'Something smells fishy' })
-          .then(({ body }) => {
-            expect(body.msg).toBe("bad request");
-          });
+  });
+  test("400: body has object but noo username key ", () => {
+    return request(app)
+      .post("/api/articles/5/comments")
+      .expect(400)
+      .send({ dfnj: "icellusedkars", body: "Something smells fishy" })
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
       });
-      test("400: body has object but no body key ", () => {
-        return request(app)
-        .post("/api/articles/5/comments")
-          .expect(400)
-          .send({ username:'icellusedkars',edf:'Something smells fishy' })
-          .then(({ body }) => {
-            expect(body.msg).toBe("bad request");
-          });
+  });
+  test("400: body has object but no body key ", () => {
+    return request(app)
+      .post("/api/articles/5/comments")
+      .expect(400)
+      .send({ username: "icellusedkars", edf: "Something smells fishy" })
+      .then(({ body }) => {
+        expect(body.msg).toBe("bad request");
       });
-      test("400: username doesnt exist", () => {
-        return request(app)
-        .post("/api/articles/5/comments")
-          .expect(400)
-          .send({ username:'ijbncd',body:'Something smells fishy' })
-          .then(({ body }) => {
-            expect(body.msg).toBe("user doesn't exist");
-          });
+  });
+  test("400: username doesnt exist", () => {
+    return request(app)
+      .post("/api/articles/5/comments")
+      .expect(400)
+      .send({ username: "ijbncd", body: "Something smells fishy" })
+      .then(({ body }) => {
+        expect(body.msg).toBe("user doesn't exist");
       });
+  });
 });
 
 describe("DELETE: /api/comments/:comment_id", () => {
@@ -468,4 +491,3 @@ describe("DELETE: /api/comments/:comment_id", () => {
       });
   });
 });
-
